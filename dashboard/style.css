@@ -1,0 +1,577 @@
+/* Claude Racehorse — dashboard styles
+   Dark by default; prefers-color-scheme: light gets a light track. */
+
+:root {
+  --bg: #0a0c11;
+  --bg-panel: #12151d;
+  --bg-lane: #171b26;
+  --bg-lane-hover: #1c2130;
+  --border: #262c3d;
+  --border-soft: #1d2230;
+  --text: #e9ebf2;
+  --text-dim: #9aa3b8;
+  --text-faint: #626d85;
+  --accent: #43d9a3;
+  --accent-soft: rgba(67, 217, 163, 0.14);
+  --amber: #f2b84b;
+  --amber-soft: rgba(242, 184, 75, 0.16);
+  --red: #ef6a6a;
+  --track-dash: rgba(255, 255, 255, 0.07);
+  --shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+  --radius: 12px;
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    --bg: #f2f3f7;
+    --bg-panel: #ffffff;
+    --bg-lane: #f8f9fc;
+    --bg-lane-hover: #eef0f7;
+    --border: #dde1ec;
+    --border-soft: #e7eaf3;
+    --text: #171a24;
+    --text-dim: #565f77;
+    --text-faint: #8891a5;
+    --accent: #0e9f6e;
+    --accent-soft: rgba(14, 159, 110, 0.12);
+    --amber: #b5790a;
+    --amber-soft: rgba(181, 121, 10, 0.14);
+    --red: #d1453d;
+    --track-dash: rgba(0, 0, 0, 0.06);
+    --shadow: 0 8px 24px rgba(20, 24, 40, 0.08);
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  line-height: 1.4;
+  overflow-x: hidden;
+}
+
+/* ---------- layout ---------- */
+
+.top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.1rem 1.5rem;
+  border-bottom: 1px solid var(--border);
+  background: linear-gradient(180deg, var(--bg-panel), var(--bg));
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.brand-mark {
+  font-size: 1.9rem;
+  line-height: 1;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.25));
+}
+
+.brand-text h1 {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+.brand-text p {
+  margin: 0.1rem 0 0;
+  font-size: 0.78rem;
+  color: var(--text-dim);
+}
+
+.conn-status {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.78rem;
+  color: var(--text-dim);
+  padding: 0.35rem 0.7rem;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--bg-panel);
+}
+
+.conn-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--text-faint);
+  box-shadow: 0 0 0 3px transparent;
+  transition: background 0.3s ease, box-shadow 0.3s ease;
+}
+
+.conn-status[data-state="live"] .conn-dot {
+  background: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+  animation: pulse-dot 1.8s ease-in-out infinite;
+}
+
+.conn-status[data-state="connecting"] .conn-dot {
+  background: var(--amber);
+  box-shadow: 0 0 0 3px var(--amber-soft);
+  animation: pulse-dot 1s ease-in-out infinite;
+}
+
+.conn-status[data-state="down"] .conn-dot {
+  background: var(--red);
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.45; }
+}
+
+main {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 1.5rem 1.5rem 3rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
+}
+
+.panel {
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+.panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.9rem 1.15rem;
+  border-bottom: 1px solid var(--border-soft);
+}
+
+.panel-head h2 {
+  margin: 0;
+  font-size: 0.92rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-dim);
+}
+
+.count-pill {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-dim);
+  background: var(--bg-lane);
+  border: 1px solid var(--border-soft);
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+}
+
+/* ---------- empty states ---------- */
+
+.empty-state {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 0.3rem;
+  padding: 2.75rem 1.5rem;
+  color: var(--text-dim);
+}
+
+.empty-state.visible {
+  display: flex;
+}
+
+.empty-emoji {
+  font-size: 2rem;
+  opacity: 0.7;
+  margin-bottom: 0.35rem;
+}
+
+.empty-state p {
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+.empty-sub {
+  font-size: 0.78rem !important;
+  color: var(--text-faint);
+}
+
+/* ---------- track / lanes ---------- */
+
+.track-field {
+  position: relative;
+}
+
+.lanes {
+  display: flex;
+  flex-direction: column;
+}
+
+.lane {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 132px;
+  gap: 0.75rem;
+  align-items: center;
+  padding: 0.75rem 1.15rem;
+  border-bottom: 1px solid var(--border-soft);
+  background: var(--bg-lane);
+  animation: lane-in 0.35s ease;
+  max-height: 100px;
+  transition: max-height 0.4s ease, opacity 0.4s ease, padding 0.4s ease;
+  overflow: hidden;
+}
+
+.lane:last-child {
+  border-bottom: none;
+}
+
+.lane.leaving {
+  max-height: 0;
+  opacity: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+  border-bottom-width: 0;
+}
+
+@keyframes lane-in {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.lane.flash .lane-meta {
+  animation: flash-bg 0.6s ease;
+}
+
+@keyframes flash-bg {
+  0% { background-color: transparent; }
+  35% { background-color: var(--accent-soft); }
+  100% { background-color: transparent; }
+}
+
+.lane-meta {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr);
+  gap: 0.65rem;
+  align-items: center;
+  min-width: 0;
+  border-radius: 8px;
+}
+
+.silk {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: #06120c;
+  flex-shrink: 0;
+  box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.25);
+}
+
+.lane-info {
+  min-width: 0;
+}
+
+.lane-top-row {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.15rem;
+}
+
+.badge {
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 0.12rem 0.45rem;
+  border-radius: 5px;
+  white-space: nowrap;
+}
+
+.badge.kind-session {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+.badge.kind-subagent {
+  background: rgba(120, 150, 255, 0.16);
+  color: #8fa6ff;
+}
+
+@media (prefers-color-scheme: light) {
+  .badge.kind-subagent {
+    background: rgba(60, 90, 220, 0.12);
+    color: #3c5adc;
+  }
+}
+
+.badge.auto-badge {
+  background: var(--amber-soft);
+  color: var(--amber);
+}
+
+.elapsed {
+  margin-left: auto;
+  font-variant-numeric: tabular-nums;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--text-dim);
+  white-space: nowrap;
+}
+
+.activity-label {
+  font-size: 0.86rem;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.lane-sub {
+  margin-top: 0.1rem;
+  font-size: 0.72rem;
+  color: var(--text-faint);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ---------- the track strip + galloping horse ---------- */
+
+.track {
+  position: relative;
+  height: 44px;
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--bg-lane-hover);
+  border: 1px solid var(--border-soft);
+}
+
+.track-dashes {
+  position: absolute;
+  inset: 0;
+  background-image: repeating-linear-gradient(
+    90deg,
+    var(--track-dash) 0 14px,
+    transparent 14px 30px
+  );
+  animation: dash-scroll var(--dash-dur, 0.9s) linear infinite;
+}
+
+@keyframes dash-scroll {
+  from { background-position: 0 0; }
+  to { background-position: -30px 0; }
+}
+
+.finish-flag {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 10px;
+  background-image:
+    linear-gradient(45deg, currentColor 25%, transparent 25%),
+    linear-gradient(-45deg, currentColor 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, currentColor 75%),
+    linear-gradient(-45deg, transparent 75%, currentColor 75%);
+  background-size: 6px 6px;
+  background-position: 0 0, 0 3px, 3px -3px, -3px 0;
+  color: var(--text-faint);
+  opacity: 0.55;
+}
+
+.runner {
+  position: absolute;
+  left: 6px;
+  top: 50%;
+  font-size: 1.35rem;
+  line-height: 1;
+  transform: translateY(-50%);
+  animation: gallop var(--gallop-dur, 0.5s) ease-in-out infinite;
+  will-change: transform;
+}
+
+@keyframes gallop {
+  0%   { transform: translate(0, -50%) rotate(0deg); }
+  25%  { transform: translate(3px, -58%) rotate(-6deg); }
+  50%  { transform: translate(7px, -50%) rotate(0deg); }
+  75%  { transform: translate(3px, -42%) rotate(5deg); }
+  100% { transform: translate(0, -50%) rotate(0deg); }
+}
+
+.runner.crossing {
+  animation: gallop-cross 0.7s ease-in forwards;
+}
+
+@keyframes gallop-cross {
+  0%   { transform: translate(0, -50%) rotate(0deg); }
+  60%  { transform: translate(calc(100% + 40px), -55%) rotate(-4deg); }
+  100% { transform: translate(calc(100% + 90px), -50%) rotate(0deg); opacity: 0; }
+}
+
+.stalled-tag {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--amber);
+  background: var(--amber-soft);
+}
+
+/* ---------- results ---------- */
+
+.results {
+  display: flex;
+  flex-direction: column;
+}
+
+.result-row {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr) auto;
+  gap: 0.65rem;
+  align-items: center;
+  padding: 0.6rem 1.15rem;
+  border-bottom: 1px solid var(--border-soft);
+  animation: result-in 0.4s ease;
+}
+
+.result-row:last-child {
+  border-bottom: none;
+}
+
+@keyframes result-in {
+  from { opacity: 0; background-color: var(--accent-soft); }
+  to { opacity: 1; background-color: transparent; }
+}
+
+.result-info {
+  min-width: 0;
+}
+
+.result-top-row {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.1rem;
+}
+
+.status-pill {
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 0.12rem 0.45rem;
+  border-radius: 5px;
+}
+
+.status-pill.finished {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+.status-pill.stalled {
+  background: var(--amber-soft);
+  color: var(--amber);
+}
+
+.result-activity {
+  font-size: 0.83rem;
+  color: var(--text-dim);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.result-duration {
+  font-variant-numeric: tabular-nums;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--text-dim);
+  white-space: nowrap;
+  text-align: right;
+}
+
+/* ---------- footer ---------- */
+
+.foot-note {
+  text-align: center;
+  padding: 0 1.5rem 2rem;
+  font-size: 0.72rem;
+  color: var(--text-faint);
+}
+
+.foot-note code {
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 0.05rem 0.35rem;
+}
+
+/* ---------- small screens ---------- */
+
+@media (max-width: 620px) {
+  .lane {
+    grid-template-columns: 1fr;
+  }
+  .track {
+    height: 34px;
+  }
+  .result-row {
+    grid-template-columns: 28px minmax(0, 1fr);
+  }
+  .result-duration {
+    grid-column: 2;
+    text-align: left;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .runner,
+  .track-dashes,
+  .conn-dot {
+    animation: none !important;
+  }
+}
+
+/* Keyboard focus ring (accessibility floor): the view/tab
+   controls and any focusable element get a clear ring for keyboard and switch
+   users. :focus-visible keeps mouse clicks quiet. The connection-status dot is
+   left as-is on purpose: it carries a real state (is the live feed connected?)
+   and already has a visible text twin (.conn-label), so it is an honest seam,
+   not a decorative status dot. */
+:where(button, a, input, select, [tabindex]):focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 4px;
+}

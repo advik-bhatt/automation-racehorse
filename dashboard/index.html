@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Claude Racehorse</title>
+<link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+  <header class="top-bar">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true">🏇</span>
+      <div class="brand-text">
+        <h1>Claude Racehorse</h1>
+        <p>live race view of Claude Code activity</p>
+      </div>
+    </div>
+    <div class="conn-status" id="conn-status" data-state="connecting">
+      <span class="conn-dot" aria-hidden="true"></span>
+      <span class="conn-label" id="conn-label">connecting…</span>
+    </div>
+  </header>
+
+  <main>
+    <section class="panel track-panel" aria-labelledby="track-heading">
+      <div class="panel-head">
+        <h2 id="track-heading">On the track</h2>
+        <span class="count-pill" id="running-count">0 running</span>
+      </div>
+
+      <div class="track-field" id="track-field">
+        <div class="empty-state" id="track-empty">
+          <span class="empty-emoji" aria-hidden="true">🐴</span>
+          <p>waiting for Claude Code activity&hellip;</p>
+          <p class="empty-sub">horses appear here the moment a session, subagent, or skill starts running.</p>
+        </div>
+        <div class="lanes" id="lanes"></div>
+      </div>
+    </section>
+
+    <section class="panel results-panel" aria-labelledby="results-heading">
+      <div class="panel-head">
+        <h2 id="results-heading">Recent finishers</h2>
+        <span class="count-pill" id="results-count">0 finished</span>
+      </div>
+
+      <div class="results-field" id="results-field">
+        <div class="empty-state" id="results-empty">
+          <span class="empty-emoji" aria-hidden="true">🏁</span>
+          <p>nobody's crossed the line yet.</p>
+        </div>
+        <div class="results" id="results"></div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="foot-note">
+    <span>automation-racehorse &middot; polling <code>/api/events</code></span>
+  </footer>
+
+  <script src="/app.js" defer></script>
+</body>
+</html>

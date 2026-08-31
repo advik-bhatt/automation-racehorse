@@ -1,0 +1,74 @@
+#!/usr/bin/env python3
+"""racehorse: CLI entrypoint. See README.md for the full picture.
+
+Subcommands:
+  hook     read one Claude Code hook payload from stdin, log it (used by
+           the hooks wired into ~/.claude/settings.json by install.sh)
+  serve    run the live dashboard (HTTP + SSE) at http://127.0.0.1:8790
+  mcp      run the MCP stdio server (registered by install.sh)
+  status   print current race state to the terminal
+"""
+from __future__ import annotations
+
+import argparse
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+
+from racehorse_lib import hook, server, store  # noqa: E402
+
+
+def cmd_hook(_args: argparse.Namespace) -> int:
+    hook.handle_stdin()
+    return 0
+
+
+def cmd_serve(args: argparse.Namespace) -> int:
+    server.serve(port=args.port, no_open=args.no_open, bind=args.bind)
+    return 0
+
+
+def cmd_mcp(_args: argparse.Namespace) -> int:
+    from racehorse_lib import mcp_server
+
+    mcp_server.run()
+    return 0
+
+
+def cmd_status(_args: argparse.Namespace) -> int:
+    snapshot = store.build_snapshot()
+    running = snapshot["horses"]
+    history = snapshot["history"]
+    print(f"racehorse: {store.events_path()}")
+    print(f"  {len(running)} running, {len(history)} in recent history")
+    for h in running:
+        kind = "subagent" if h["kind"] == "subagent" else "session"
+        mode = f" [{h['permission_mode']}]" if h.get("permission_mode") else ""
+        print(f"  running  {kind:9s} {h['horse_id'][:12]:12s} {h['activity_label']}{mode}")
+    for h in history[:10]:
+        print(f"  {h['status']:8s} {h['kind']:9s} {h['horse_id'][:12]:12s} {h['activity_label']}")
+    return 0
+
+
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(prog="racehorse", description=__doc__)
+    sub = parser.add_subparsers(dest="command", required=True)
+
+    sub.add_parser("hook", help="normalize one hook payload from stdin").set_defaults(func=cmd_hook)
+
+    serve_parser = sub.add_parser("serve", help="run the live dashboard")
+    serve_parser.add_argument("--port", type=int, default=8790)
+    serve_parser.add_argument("--bind", default="127.0.0.1")
+    serve_parser.add_argument("--no-open", action="store_true")
+    serve_parser.set_defaults(func=cmd_serve)
+
+    sub.add_parser("mcp", help="run the MCP stdio server").set_defaults(func=cmd_mcp)
+    sub.add_parser("status", help="print current race state").set_defaults(func=cmd_status)
+
+    args = parser.parse_args(argv)
+    return args.func(args)
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
